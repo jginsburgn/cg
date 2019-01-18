@@ -13,3 +13,5 @@ Rubric:
 4. The figures were rendered as in the Figure.
 
 *Add a symbolic link or a shortcut to the libs library to get the assignment to work.*
+
+**Deadline: January 22, 13:00 hrs**
