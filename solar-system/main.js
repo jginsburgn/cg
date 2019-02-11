@@ -6,8 +6,6 @@ let target = undefined;
 
 function createCamera() {
   camera = new THREE.OrthographicCamera();
-  camera.position.z = 1E10;
-  //camera.position.y = 61691041.22105463;
   camera.lookAt(0, 0, 0);
 }
 
@@ -19,12 +17,14 @@ function createCamera() {
 
 function createRenderer() {
   renderer = new THREE.WebGLRenderer();
-  //renderer.autoClear = true;
-  document.body.appendChild(renderer.domElement);
+  renderer.autoClear = true;
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap = THREE.PCFShadowMap;
+  $("#canvas-holder").append(renderer.domElement);
 }
 
 function createControls() {
-  controls = new THREE.OrbitControls(camera);
+  controls = new THREE.OrbitControls(camera, $("canvas").get(0));
   // controls.zoomSpeed = 5;
   controls.rotateSpeed = 0.05;
   // controls.maxAzimuthAngle = 0;
@@ -32,19 +32,35 @@ function createControls() {
   // controls.enableZoom = false;
 }
 
-function updateCamera() {
-  const fieldOfView = 1E6;
-  const width = window.innerWidth;
-  const height = window.innerHeight;
+const cameraDisplacement = new THREE.Vector3(0, 2, 50);
+function updateCamera(fieldOfView) {
+  if (!fieldOfView) {
+    fieldOfView = 2;
+  }
+  const parent = $("#canvas-holder");
+  const width = parent.width();
+  const height = parent.height();
   const ratio = width / height;
   camera.left = -fieldOfView / 2 * ratio;
   camera.right = fieldOfView / 2 * ratio;
   camera.top = fieldOfView / 2;
   camera.bottom = -fieldOfView / 2;
   camera.near = 0;
-  camera.far = 1E20;
+  camera.far = cameraDisplacement.z * 2;
   camera.updateProjectionMatrix();
-  // controls.update();
+}
+
+function flyCamera(target) {
+  const targetPosition = target.getPosition();
+  const cameraPosition = targetPosition.clone();
+  updateCamera(target.radius * 10);
+  cameraPosition.z = target.radius;
+  cameraPosition.add(cameraDisplacement);
+  camera.position.copy(cameraPosition);
+  camera.lookAt(target.getPosition());
+  camera.updateProjectionMatrix();
+  controls.target = targetPosition;
+  controls.update();
 }
 
 // function updateCamera() {
@@ -60,8 +76,9 @@ function updateCamera() {
 // }
 
 function updateRenderer() {
-  const width = $(window).width();
-  const height = $(window).height();
+  const parent = $("#canvas-holder");
+  const width = parent.width();
+  const height = parent.height();
   renderer.setSize(width, height);
 }
 
@@ -73,9 +90,14 @@ function bootSequence() {
   updateRenderer();
 }
 
-const cameraDisplacement = new THREE.Vector3(0, 0, 1E6);
+function loadAstrosInfo(path, cb) {
+  $.get(path, function (data) {
+    cb(data);
+  });
+}
+
 function centerCameraOn(target) {
-  const targetPosition = target.getPosition();
+  const targetPosition = target.getPosition && target.getPosition() || target.position;
   // const cameraPosition = targetPosition.clone();
   // cameraPosition.z = target.orbitalRadius;
   // cameraPosition.add(cameraDisplacement);
@@ -86,78 +108,76 @@ function centerCameraOn(target) {
   controls.update();
 }
 
-setInterval(()=>{
-  console.log(camera.position);
-  console.log(target.getPosition());
-  const vector = new THREE.Vector3();
-  camera.getWorldDirection(vector);
-  console.log(camera.zoom, vector);
-}, 1000);
+// setInterval(()=>{
+//   console.log(camera.position);
+//   console.log(target.getPosition());
+//   const vector = new THREE.Vector3();
+//   camera.getWorldDirection(vector);
+//   console.log(camera.zoom, vector);
+// }, 1000);
 
-function main() {
-  bootSequence();
-
-  universe = new Universe();
-
-  const sun = new Astro({
-    resourcesURL: "sun",
-    radius: 695700,
-    obliquityToOrbit: 7.25,
-    rotationalPeriod: 1 / 365 * 25,
-  });
-
-  const earth = new Astro({
-    resourcesURL: "earth",
-    radius: 6370,
-    orbitalRadius: 147.09E6,
-    orbitalPeriod: 1,
-    orbitalAzimuth: 0,
-    orbitalColor: [1, 0, 1],
-    orbitalInclination: 0,
-    obliquityToOrbit: -23.4,
-    rotationalPeriod: 1 / 365,
-  });
-  sun.addOrbiter(earth);
-
-  const moon = new Astro({
-    resourcesURL: "moon",
-    radius: 1737,
-    orbitalRadius: 362600,
-    orbitalPeriod: 1 / 365 * 27.322,
-    orbitalAzimuth: 90,
-    orbitalColor: [1, 1, 1],
-    orbitalInclination: 5.145,
-    obliquityToOrbit: -6.68,
-    rotationalPeriod: Infinity,
-  });
-  earth.addOrbiter(moon);
-
-  universe.addAstro(sun);
-
-  target = earth;
-
-  animate = function(time) {
+function startAnimationLoop() {
+  animate = function (time) {
     universe.tick(time);
     centerCameraOn(target);
     renderer.render(universe.threeScene, camera);
     requestAnimationFrame(animate);
   }
   animate(0);
-
-
-  window.addEventListener(
-    "resize",
-    function () {
-      updateCamera();
-      updateRenderer();
-    },
-    false
-  );
 }
 
-$(window).keydown(function(event) {
-  console.log(event.key);
-  cameraDisplacement.setY(cameraDisplacement.y + 100);
-  console.log(cameraDisplacement);
-});
+function main() {
+  bootSequence();
+
+  universe = new Universe();
+
+  loadAstrosInfo("index.json", function (astrosInfo) {
+    const sunInfo = astrosInfo.sun;
+    const sun = Astro.FromInfo("sun", sunInfo);
+    universe.addAstro(sun);
+    target = sun;
+    flyCamera(target);
+    startAnimationLoop();
+    const tree = sun.getTreeInfo();
+    buildTree(tree, function (_, action) {
+      const astroName = action.node.text;
+      const newTarget = sun.searchForAstro(astroName);
+      target = newTarget;
+      flyCamera(target);
+    });
+
+    // var loader = new THREE.OBJLoader();
+
+    // loader.load('Rock.obj', function (gltf) {
+    //   const textureLoader = new THREE.TextureLoader();
+    //   const texture = textureLoader.load("Rock.jpg");
+    //   console.log(gltf);
+    //   gltf.scale.copy(new THREE.Vector3(0.0000001, 0.0000001, 0.0000001));
+    //   gltf.position.copy(new THREE.Vector3(0, 0, 0.1));
+    //   gltf.children[0].material.map = texture;
+    //   universe.addObject(gltf);
+    //   target = gltf;
+    // }, undefined, function (error) {
+
+    //   console.error(error);
+
+    // });
+  });
+}
+
+// $(window).keydown(function(event) {
+//   console.log(event.key);
+//   cameraDisplacement.setY(cameraDisplacement.y + 100);
+//   console.log(cameraDisplacement);
+// });
+
+window.addEventListener(
+  "resize",
+  function () {
+    updateCamera();
+    updateRenderer();
+    flyCamera(target);
+  },
+  false
+);
 

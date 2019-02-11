@@ -1,0 +1,164 @@
+{
+  "sun": {
+    "resourcesURL": "sun",
+    "anchor": [0, 0, 0],
+    "radius": 695700,
+    "rotationalPeriod": 609.12,
+    "obliquityToOrbit": 7.25,
+    "light": true,
+    "orbiters": {
+      "mercury": {
+        "radius": 2439.5,
+        "rotationalPeriod": 1407.6,
+        "orbitalRadius": 57.9E6,
+        "orbitalPeriod": 2112,
+        "orbitalAzimuth": 0,
+        "orbitalColor": [196, 195, 202],
+        "orbitalInclination": 7.0,
+        "obliquityToOrbit": 0.034
+      },
+      "venus": {
+        "radius": 6052,
+        "rotationalPeriod": -5832.5,
+        "orbitalRadius": 108.2E6,
+        "orbitalPeriod": -5392.8,
+        "orbitalAzimuth": 0,
+        "orbitalColor": [92, 88, 59],
+        "orbitalInclination": 3.4,
+        "obliquityToOrbit": 177.4
+      },
+      "earth": {
+        "radius": 6370,
+        "rotationalPeriod": 24.0,
+        "orbitalRadius": 147.09E6,
+        "orbitalPeriod": 8764.8,
+        "orbitalAzimuth": 0,
+        "orbitalColor": [65, 69, 104],
+        "orbitalInclination": 0,
+        "obliquityToOrbit": -23.4,
+        "orbiters": {
+          "moon": {
+            "radius": 1737.5,
+            "rotationalPeriod": 655.7,
+            "orbitalRadius": 384400,
+            "orbitalPeriod": 655.72,
+            "orbitalAzimuth": 0,
+            "orbitalColor": [137, 131, 131],
+            "orbitalInclination": 5.145,
+            "obliquityToOrbit": 6.68
+          }
+        }
+      },
+      "mars": {
+        "radius": 3396,
+        "rotationalPeriod": 24.6,
+        "orbitalRadius": 227.9E6,
+        "orbitalPeriod": 16488,
+        "orbitalAzimuth": 0,
+        "orbitalColor": [233, 124, 91],
+        "orbitalInclination": 1.9,
+        "obliquityToOrbit": 25.2
+      },
+      "jupiter": {
+        "radius": 71492,
+        "rotationalPeriod": 9.9,
+        "orbitalRadius": 778.6E6,
+        "orbitalPeriod": 103944,
+        "orbitalAzimuth": 0,
+        "orbitalColor": [189, 126, 57],
+        "orbitalInclination": 1.3,
+        "obliquityToOrbit": 3.1,
+        "orbiters": {
+          "io": {
+            "radius": 1821,
+            "rotationalPeriod": 42.45930686,
+            "orbitalRadius": 421700,
+            "orbitalPeriod": 42.45930686,
+            "orbitalAzimuth": 0,
+            "orbitalColor": [10, 220, 131],
+            "orbitalInclination": 0.05,
+            "obliquityToOrbit": 0
+          },
+          "callisto": {
+            "radius": 2410.3,
+            "rotationalPeriod": 400.5364416,
+            "orbitalRadius": 1882700,
+            "orbitalPeriod": 400.5364416,
+            "orbitalAzimuth": 0,
+            "orbitalColor": [13, 131, 200],
+            "orbitalInclination": 0.192,
+            "obliquityToOrbit": 0
+          },
+          "ganymede": {
+            "radius": 2634.1,
+            "rotationalPeriod": 171.696,
+            "orbitalRadius": 1070400,
+            "orbitalPeriod": 171.696,
+            "orbitalAzimuth": 0,
+            "orbitalColor": [13, 13, 170],
+            "orbitalInclination": 0.20,
+            "obliquityToOrbit": 0.33
+          },
+          "europa": {
+            "radius": 1560.8,
+            "rotationalPeriod": 85.224,
+            "orbitalRadius": 670900,
+            "orbitalPeriod": 85.224,
+            "orbitalAzimuth": 0,
+            "orbitalColor": [38, 190, 190],
+            "orbitalInclination": 0.470,
+            "obliquityToOrbit": 0.1
+          }
+        }
+      },
+      "saturn": {
+        "radius": 60268,
+        "rotationalPeriod": 10.7,
+        "orbitalRadius": 1433.5E6,
+        "orbitalPeriod": 257928,
+        "orbitalAzimuth": 0,
+        "orbitalColor": [238, 201, 133],
+        "orbitalInclination": 2.5,
+        "obliquityToOrbit": 26.7,
+        "rings": {
+          "innerRadius": 67300,
+          "outerRadius": 143000
+        }
+      },
+      "uranus": {
+        "radius": 25559,
+        "rotationalPeriod": -17.2,
+        "orbitalRadius": 2872.5E6,
+        "orbitalPeriod": -734136,
+        "orbitalAzimuth": 0,
+        "orbitalColor": [193, 231, 234],
+        "orbitalInclination": 0.8,
+        "obliquityToOrbit": 97.8,
+        "rings": {
+          "innerRadius": 26840,
+          "outerRadius": 103000
+        }
+      },
+      "neptune": {
+        "radius": 24764,
+        "rotationalPeriod": 16.1,
+        "orbitalRadius": 4495.1E6,
+        "orbitalPeriod": 1435200,
+        "orbitalAzimuth": 0,
+        "orbitalColor": [70, 122, 250],
+        "orbitalInclination": 1.8,
+        "obliquityToOrbit": 28.3
+      },
+      "pluto": {
+        "radius": 1185,
+        "rotationalPeriod": -153.3,
+        "orbitalRadius": 5906.4E6,
+        "orbitalPeriod": 2173440,
+        "orbitalAzimuth": 0,
+        "orbitalColor": [101, 73, 70],
+        "orbitalInclination": 17.2,
+        "obliquityToOrbit": 122.5
+      }
+    }
+  }
+}

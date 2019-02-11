@@ -6,15 +6,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Solar System</title>
+  <link rel="stylesheet" href="vendors/jstree/themes/default/style.min.css">
   <link rel="stylesheet" href="style.css">
   <script src="../libs/jquery-3.3.1/jquery-3.3.1.min.js"></script>
   <script src="../libs/three.js/three.js"></script>
   <script src="../libs/three.js/loaders/GLTFLoader.js"></script>
+  <script src="../libs/three.js/loaders/FBXLoader.js"></script>
+  <script src="../libs/three.js/loaders/OBJLoader.js"></script>
   <script src="../libs/three.js/controls/OrbitControls.js"></script>
+  <script src="vendors/jstree/jstree.min.js"></script>
+  <script src="vendors/zlib/inflate.min.js"></script>
   <script src="helper.js"></script>
   <script src="Universe.js"></script>
   <script src="Astro.js"></script>
   <script src="main.js"></script>
+  <script src="tree.js"></script>
   <script>
     $(document).ready(function () {
       main();
@@ -23,7 +29,12 @@
 </head>
 
 <body>
+  <div id="tree-holder">
+    <div id="tree"></div>
+  </div>
+  <div id="canvas-holder">
 
+  </div>
 </body>
 
 </html>
