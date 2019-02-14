@@ -3,19 +3,13 @@ class Universe {
     this.threeScene = new THREE.Scene();
     this.astros = [];
     this.pastTime = 0;
-
-    // const light = new THREE.AmbientLight(0xffffff);
-    // this.threeScene.add(light);
-
-
-    // this.threeScene.background = new THREE.Color( 0xffffff );
   }
 
   static _realToUniverseTime(time) {
     // Time given in milliseconds
     // Return value must be in years
-    // return time / 1000 / 365 / 24 / 60; // Each second is a minute
-    return time / 1000 / 365 / 24; // Each second is an hour
+    return time / 1000 / 365 / 24 / 60; // Each second is a minute
+    // return time / 1000 / 365 / 24; // Each second is an hour
     // return time / 1000 / 365; // Each second is a day
     // return time / 1000 / 365 * 10 // Each second is ten days;
     // return time / 1000 / 365 * 30 // Each second is thirty days;

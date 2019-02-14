@@ -1,7 +1,7 @@
 const ORBITS_WIDTH = Km2AU(0.001);
 
 class Astro {
-  static FromInfo(name, info, dirname) {
+  static async FromInfo(name, info, dirname) {
     const currentInfo = {
       resourcesURL: undefined,
       radius: undefined,
@@ -51,11 +51,15 @@ class Astro {
     if (info.light) {
       currentInfo.light = info.light;
     }
+    if (info.model) {
+      currentInfo.model = info.model;
+    }
     const astro = new Astro(currentInfo);
+    await astro.isDone();
     if (info.orbiters) {
       for (let orbiterName in info.orbiters) {
         const orbiterInfo = info.orbiters[orbiterName];
-        const orbiter = Astro.FromInfo(orbiterName, orbiterInfo, `${currentInfo.resourcesURL}/orbiters`);
+        const orbiter = await Astro.FromInfo(orbiterName, orbiterInfo, `${currentInfo.resourcesURL}/orbiters`);
         astro.addOrbiter(orbiter);
       }
     }
@@ -63,31 +67,92 @@ class Astro {
   }
 
   constructor(properties) {
+    this.stillWaiting = true;
+    this.waiters = [];
     Object.assign(this, properties);
     this.orbiters = [];
-    this._buildObject();
+    this._buildSequence();
   }
 
-  _buildObject() {
-    this.geometry = new THREE.SphereBufferGeometry(this.radius, 100, 100);
+  _digestWaiters() {
+    this.stillWaiting = false;
+    let waiter = undefined;
+    while (waiter = this.waiters.pop()) {
+      waiter();
+    }
+  }
+
+  async _buildGeometry() {
+    this.stillWaiting = true;
+    return new Promise(
+      (resolve, reject) => {
+        if (this.model) {
+          switch (this.model) {
+            case "obj":
+              const modelLoader = new THREE.OBJLoader();
+              modelLoader.load(
+                `${this.resourcesURL}/geometry/model.obj`,
+                (model) => {
+                  const bufferGeometry = model.children[0].geometry;
+                  this.geometry = new THREE.Geometry();
+                  this.geometry.fromBufferGeometry(bufferGeometry);
+                  this.geometry.computeBoundingSphere();
+                  const boundingSphere = this.geometry.boundingSphere;
+                  const boundingRadius = boundingSphere.radius;
+                  const scaleFactor = this.radius / boundingRadius;
+                  this.geometry.scale(scaleFactor, scaleFactor, scaleFactor);
+                  this._digestWaiters();
+                  resolve();
+                },
+                undefined,
+                (error) => {
+                  reject(error);
+                }
+              );
+              break;
+            default:
+              break;
+          }
+        }
+        else {
+          this.geometry = new THREE.SphereBufferGeometry(this.radius, 100, 100);
+          this._digestWaiters();
+          resolve();
+        }
+      }
+    );
+  }
+
+  _buildMaterial() {
     const textureLoader = new THREE.TextureLoader();
     const map = textureLoader.load(`${this.resourcesURL}/textures/texture.jpg`);
     const specularMap = textureLoader.load(`${this.resourcesURL}/textures/specular.jpg`);
     const bumpMap = textureLoader.load(`${this.resourcesURL}/textures/bump.jpg`);
-    this.material = new THREE.MeshPhongMaterial({
-      shininess: 1,
-      map,
-      specularMap,
-      bumpMap,
-      bumpScale: 0,
-      side: THREE.FrontSide,
-      shadowSide: THREE.DoubleSide,
-    });
+    if (this.light) {
+      this.material = new THREE.MeshBasicMaterial({
+        map,
+        specularMap,
+        side: THREE.FrontSide,
+        shadowSide: THREE.DoubleSide,
+      });
+    }
+    else {
+      this.material = new THREE.MeshPhongMaterial({
+        shininess: 1,
+        map,
+        specularMap,
+        bumpMap,
+        bumpScale: 0,
+        side: THREE.FrontSide,
+        shadowSide: THREE.DoubleSide,
+      });
+    }
+  }
 
+  _buildObject() {
     if (this.light) {
       const light = new THREE.PointLight(0xffffff, 1.1, 0);
       light.castShadow = true;
-      this.material.side = THREE.BackSide;
       const sphere = new THREE.Mesh(this.geometry, this.material);
       light.add(sphere);
       this.threeObject = light;
@@ -97,6 +162,58 @@ class Astro {
       this.threeObject.castShadow = true;
       this.threeObject.receiveShadow = true;
     }
+  }
+
+  _buildRings() {
+    const inner = this.rings.innerRadius;
+    const outer = this.rings.outerRadius;
+    const geometry = new THREE.RingGeometry(inner, outer, 100);
+
+    const faces = geometry.faces;
+    const vertices = geometry.vertices;
+    const vertexNames = ["a", "b", "c"];
+
+    const uvs = [];
+
+    const fullAngle = Math.PI * 2;
+
+    for (let i = 0; i < faces.length; i++) {
+
+      const face = faces[i];
+      const subUVs = [];
+      for (let vertexName of vertexNames) {
+        const currentVertex = vertices[face[vertexName]];
+        let theta = Math.atan2(currentVertex.y, currentVertex.x);
+        if (theta < 0) {
+          theta = Math.PI - theta;
+        }
+        const r = (Math.sqrt(currentVertex.x ** 2 + currentVertex.y ** 2) - inner) / (outer - inner);
+        subUVs.push(new THREE.Vector2(r, theta / fullAngle));
+      }
+
+      uvs.push(subUVs);
+    }
+
+    geometry.faceVertexUvs[0] = uvs;
+    geometry.faceVertexUvs[1] = uvs;
+    geometry.uvsNeedUpdate = true;
+    const textureLoader = new THREE.TextureLoader();
+    const texture = textureLoader.load(`${this.resourcesURL}/textures/ring-texture.jpg`);
+    texture.mapping = THREE.SphericalReflectionMapping;
+    const transparency = textureLoader.load(`${this.resourcesURL}/textures/ring-transparency.gif`);
+    const material = new THREE.MeshPhongMaterial({ map: texture, alphaMap: transparency, side: THREE.DoubleSide });
+    material.transparent = true;
+    const rings = new THREE.Mesh(geometry, material);
+    rings.castShadow = true;
+    rings.receiveShadow = true;
+    rings.rotateX(º2r(90));
+    this.astroParent.add(rings);
+  }
+
+  async _buildSequence() {
+    await this._buildGeometry();
+    this._buildMaterial();
+    this._buildObject();
 
     this.astroRoot = new THREE.Group();
 
@@ -114,49 +231,7 @@ class Astro {
     this.astroParent.rotateZ(º2r(this.obliquityToOrbit));
 
     if (this.rings) {
-      const inner = this.rings.innerRadius;
-      const outer = this.rings.outerRadius;
-      const geometry = new THREE.RingGeometry(inner, outer, 100);
-
-      const faces = geometry.faces;
-      const vertices = geometry.vertices;
-      const vertexNames = ["a", "b", "c"];
-
-      const uvs = [];
-
-      const fullAngle = Math.PI * 2;
-
-      for (let i = 0; i < faces.length; i++) {
-
-        const face = faces[i];
-        const subUVs = [];
-        for (let vertexName of vertexNames) {
-          const currentVertex = vertices[face[vertexName]];
-          let theta = Math.atan2(currentVertex.y, currentVertex.x);
-          if (theta < 0) {
-            theta = Math.PI - theta;
-          }
-          const r = (Math.sqrt(currentVertex.x ** 2 + currentVertex.y ** 2) - inner) / (outer - inner);
-
-          subUVs.push(new THREE.Vector2(r, theta/fullAngle));
-        }
-
-        uvs.push(subUVs);
-      }
-
-      geometry.faceVertexUvs[0] = uvs;
-      geometry.faceVertexUvs[1] = uvs;
-      geometry.uvsNeedUpdate = true;
-      const texture = textureLoader.load(`${this.resourcesURL}/textures/ring-texture.jpg`);
-      texture.mapping = THREE.SphericalReflectionMapping;
-      const transparency = textureLoader.load(`${this.resourcesURL}/textures/ring-transparency.gif`);
-      const material = new THREE.MeshPhongMaterial({ map: texture, alphaMap: transparency, side: THREE.DoubleSide });
-      material.transparent = true;
-      const rings = new THREE.Mesh(geometry, material);
-      rings.castShadow = true;
-      rings.receiveShadow = true;
-      rings.rotateX(º2r(90));
-      this.astroParent.add(rings);
+      this._buildRings();
     }
   }
 
@@ -172,6 +247,17 @@ class Astro {
     orbit.rotateY(º2r(astro.orbitalInclination));
     this.astroRoot.add(orbit);
     return orbit;
+  }
+
+  async isDone() {
+    return new Promise((resolve, _) => {
+      if (this.stillWaiting) {
+        this.waiters.push(resolve);
+      }
+      else {
+        resolve();
+      }
+    });
   }
 
   getObject() {
