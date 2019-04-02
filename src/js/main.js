@@ -51,7 +51,6 @@ function updateViewport() {
   camera.updateProjectionMatrix();
   renderer.setSize(width, height);
   Ship.updatePositionBounds(camera.aspect * camera.fov / 5.7 / 2, camera.fov / 5.7 / 2);
-  console.log(camera.fov, camera.aspect);
 }
 
 $(window).on(
