@@ -41,17 +41,6 @@ function getWidthAndHeight() {
   return { width, height };
 }
 
-function modifyPlane(w, h) {
-  if (plane) scene.remove(plane);
-  var geometry = new THREE.PlaneGeometry(w, h);
-  var material = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide });
-  plane = new THREE.Mesh(geometry, material);
-  plane.position.setZ(-10);
-  // plane.rotation.set(Math.PI / 2);
-  console.log(scene);
-  scene.add(plane);
-}
-
 function updateViewport() {
   // A trial-and-error-deduced multiplier to achieve a FOV for an average user in front of a computer screen
   const ANGLE_MULTIPLIER = 2.25E-2;
