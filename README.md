@@ -26,4 +26,8 @@ The game must have the following:
 - A high score and timer were correctly implemented.
 - UI was correctly displayed.
 
+**Credits:**
+
+- Credit for the 3D model of the spaceship goes to [Liz Reddington](https://poly.google.com/user/0Y3UZeQ65oG)
+
 **Deadline:** 29/03/2019
