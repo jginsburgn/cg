@@ -20,8 +20,8 @@ class Ship extends THREE.Object3D {
     const loader = new THREE.GLTFLoader();
     loader.load("src/js/Ship/assets/Lo_poly_Spaceship_03_by_Liz_Reddington.gltf", (gltf) => {
       gltf.scene.scale.set(0.001, 0.001, 0.001);
-      gltf.scene.position.setZ(-10);
       gltf.scene.rotation.set(0, Math.PI, 0);
+      this.position.setZ(-10);
       this.add(gltf.scene);
     }, undefined, function (error) {
       console.error(error);
@@ -30,12 +30,16 @@ class Ship extends THREE.Object3D {
 
   translate(x, y) {
     const newPosition = this.position.clone();
-    newPosition.set(newPosition.x + x, newPosition.y + y, 0);
+    newPosition.set(newPosition.x + x, newPosition.y + y, newPosition.z);
     const xInBounds = Ship.minX < newPosition.x && newPosition.x < Ship.maxX;
     const yInBounds = Ship.minY < newPosition.y && newPosition.y < Ship.maxY;
     if (xInBounds && yInBounds) {
       this.position.copy(newPosition);
     }
+  }
+
+  shoot() {
+    Laser.Shoot(this.position);
   }
 
   tick() {
@@ -50,6 +54,9 @@ class Ship extends THREE.Object3D {
     }
     if (keysDown.includes("d")) {
       this.translate(this.speed, 0);
+    }
+    if (keysDown.includes(" ")) {
+      this.shoot();
     }
   }
 }

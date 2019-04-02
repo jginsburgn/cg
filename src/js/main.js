@@ -32,6 +32,7 @@ function animationLoop(accumulatedTime) {
   const timeDifference = accumulatedTime - absoluteAccumulatedTime;
   absoluteAccumulatedTime = accumulatedTime;
   ship.tick();
+  Laser.tick();
   renderer.render(scene, camera);
 }
 
