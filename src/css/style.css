@@ -15,3 +15,27 @@ body, html {
   height: 100%;
   flex-grow: 1;
 }
+
+h1.ui {
+  position: absolute;
+  color: white;
+  font-family: monospace;
+  user-select: none;
+  opacity: 0.4;
+}
+
+h1#points {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+h1#life {
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 0; 
+}
+
+h1#clock {
+  left: 0;
+  margin-left: 10px;
+}
