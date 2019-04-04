@@ -9,7 +9,7 @@ class Ship extends THREE.Object3D {
     Ship.maxY = Ship.maxVerticalAbsolute;
   }
 
-  speed = 0.01;
+  speed = 0.05;
 
   constructor() {
     super();
@@ -40,6 +40,15 @@ class Ship extends THREE.Object3D {
 
   shoot() {
     Laser.Shoot(this.position);
+  }
+
+  collided(object) {
+    console.log(`Collision of ship with ${object instanceof Meteor ? "meteor" : "something"}`);
+  }
+
+  getBox() {
+    const containingBox = new THREE.Box3().setFromObject(this);
+    return containingBox;
   }
 
   tick() {

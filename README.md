@@ -29,5 +29,6 @@ The game must have the following:
 **Credits:**
 
 - Credit for the 3D model of the spaceship goes to [Liz Reddington](https://poly.google.com/user/0Y3UZeQ65oG)
+- Credit for the 3D model of the boulder/stone/meteor goes to [Poly by Google](https://poly.google.com/user/4aEd8rQgKu2)
 
 **Deadline:** 29/03/2019
