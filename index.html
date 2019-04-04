@@ -24,9 +24,15 @@
 </head>
 
 <body>
-  <h1 id="points" class="ui"><span>10</span> points</h1>
-  <h1 id="life" class="ui"><span>10</span> life</h1>
-  <h1 id="clock" class="ui"><span>1:00:00</span></h1>
+  <h1 id="points" class="ui"><span>-</span> points</h1>
+  <h1 id="life" class="ui"><span>-</span> life</h1>
+  <h1 id="clock" class="ui"><span>-</span>s</h1>
+  <div class="ui">
+    <button onclick="startGame()">Play!</button>
+    <h1 id="last-score">Last score: <span>-</span></h1>
+    <h1 id="best-score">Best score: <span>-</span></h1>
+    <p>Move ship with WASD. Shoot with space. Eliminate saucers. Avoid meteors.</p>
+  </div>
   <div id="canvas-container"></div>
 </body>
 

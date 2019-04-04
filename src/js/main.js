@@ -3,19 +3,37 @@ let scene = undefined;
 let camera = undefined;
 let absoluteAccumulatedTime = 0;
 let ship = undefined;
+let gameRunning = false;
+let ui = undefined;
+let lastScore = 0;
+let bestScore = 0;
+let score = 0;
+let life = 10;
+const totalTime = 30 * 1000;
+let beginTime = 0;
+let currentTime = 0;
 
-$(function () {
+function hideUI() {
+  ui.css("display", "none");
+}
+
+function showUI() {
+  ui.css("display", "");
+}
+
+function startGame() {
+  hideUI();
+  gameRunning = true;
+  score = 0;
+  life = 10;
+  remainingTime = 180 * 1000;
   const { width, height } = getWidthAndHeight();
   const ratio = width / height;
 
   camera = new THREE.PerspectiveCamera(17, ratio, 0.01, 10000);
-  // camera.position.set(0, 0, 0);
-  // camera.lookAt(0, 0, 0);
-  const controls = new THREE.OrbitControls(camera);
-  controls.update();
 
   renderer = new THREE.WebGLRenderer();
-  $("#canvas-container").append(renderer.domElement);
+  $("#canvas-container").html(renderer.domElement);
 
   scene = new THREE.Scene();
   var light = new THREE.AmbientLight(0xffffff); // soft white light
@@ -24,11 +42,55 @@ $(function () {
   ship = new Ship();
   scene.add(ship);
 
-  renderer.setAnimationLoop(animationLoop);
+  requestAnimationFrame(time => {
+    beginTime = time;
+    currentTime = time;
+    animationLoop(time);
+  })
   updateViewport();
+  showStats();
+}
+
+function showStats() {
+  const lifeSpan = $("#life > span");
+  const pointsSpan = $("#points > span");
+  lifeSpan.text(life.toString());
+  pointsSpan.text(score.toString());
+}
+
+function showTime() {
+  const clockSpan = $("#clock > span");
+  clockSpan.text(Math.floor((totalTime - (currentTime - beginTime))/1000));
+}
+
+function displayUI() {
+  const lastScoreSpan = ui.find("#last-score > span");
+  const bestScoreSpan = ui.find("#best-score > span");
+  lastScoreSpan.text(lastScore.toString());
+  bestScoreSpan.text(bestScore.toString());
+}
+
+function endGame() {
+  lastScore = score;
+  if (bestScore < lastScore) {
+    bestScore = lastScore;
+  }
+  showUI();
+  displayUI();
+}
+
+$(function () {
+  ui = $("div.ui");
 });
 
 function animationLoop(accumulatedTime) {
+  if (!gameRunning || currentTime - beginTime >= totalTime) {
+    endGame();
+    return;
+  }
+  
+  showTime();
+  currentTime = accumulatedTime;
   const timeDifference = accumulatedTime - absoluteAccumulatedTime;
   absoluteAccumulatedTime = accumulatedTime;
   ship.tick();
@@ -36,6 +98,7 @@ function animationLoop(accumulatedTime) {
   Meteor.tick();
   Saucer.tick();
   renderer.render(scene, camera);
+  requestAnimationFrame(animationLoop);
 }
 
 function getWidthAndHeight() {

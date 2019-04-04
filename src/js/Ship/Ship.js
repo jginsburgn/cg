@@ -42,12 +42,18 @@ class Ship extends THREE.Object3D {
     Laser.Shoot(this.position);
   }
 
-  collided(object) {
-    console.log(`Collision of ship with ${object instanceof Meteor ? "meteor" : "something"}`);
+  collided(meteor) {
+    meteor.destroy();
+    life--;
+    if (life == 0) {
+      gameRunning = false;
+    }
+    showStats();
   }
 
   saucerDestroyed() {
-    console.log("Saucer destroyed");
+    score++;
+    showStats();
   }
 
   getBox() {

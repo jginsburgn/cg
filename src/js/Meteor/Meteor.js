@@ -43,6 +43,12 @@ class Meteor extends THREE.Object3D {
     });
   }
 
+  destroy() {
+    scene.remove(this);
+    const indexOf = Meteor.meteors.indexOf(this);
+    Meteor.meteors.splice(indexOf, 1);
+  }
+
   getBox() {
     const containingBox = new THREE.Box3().setFromObject(this);
     return containingBox;
@@ -51,9 +57,7 @@ class Meteor extends THREE.Object3D {
   tick() {
     this.position.setZ(this.position.z + this.speed);
     if (this.position.z > 0) {
-      scene.remove(this);
-      const indexOf = Meteor.meteors.indexOf(this);
-      Meteor.meteors.splice(indexOf, 1);
+      this.destroy();
     }
     else {
       const thisBox = this.getBox();
