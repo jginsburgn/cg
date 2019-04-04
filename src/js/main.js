@@ -9,7 +9,7 @@ let lastScore = 0;
 let bestScore = 0;
 let score = 0;
 let life = 10;
-const totalTime = 30 * 1000;
+const totalTime = 180 * 1000;
 let beginTime = 0;
 let currentTime = 0;
 
