@@ -6,6 +6,14 @@ class Laser extends THREE.Object3D {
     new Laser(from);
   }
 
+  static GetBoxes() {
+    const boxes = [];
+    this.lasers.forEach(element => {
+      boxes.push(element.getBox());
+    });
+    return boxes;
+  }
+
   static tick() {
     this.lasers.forEach(element => {
       element.tick();
@@ -16,13 +24,18 @@ class Laser extends THREE.Object3D {
 
   constructor(from) {
     super();
-    var geometry = new THREE.SphereGeometry(0.1, 10, 10);
+    var geometry = new THREE.SphereGeometry(0.01, 10, 10);
     var material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
     var sphere = new THREE.Mesh(geometry, material);
     this.position.set(from.x, from.y, -10);
     this.add(sphere);
     Laser.lasers.push(this);
     scene.add(this);
+  }
+
+  getBox() {
+    const containingBox = new THREE.Box3().setFromObject(this);
+    return containingBox;
   }
 
   tick() {

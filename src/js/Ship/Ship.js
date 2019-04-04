@@ -46,6 +46,10 @@ class Ship extends THREE.Object3D {
     console.log(`Collision of ship with ${object instanceof Meteor ? "meteor" : "something"}`);
   }
 
+  saucerDestroyed() {
+    console.log("Saucer destroyed");
+  }
+
   getBox() {
     const containingBox = new THREE.Box3().setFromObject(this);
     return containingBox;

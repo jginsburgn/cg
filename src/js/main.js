@@ -24,8 +24,6 @@ $(function () {
   ship = new Ship();
   scene.add(ship);
 
-  Meteor.Appear();
-
   renderer.setAnimationLoop(animationLoop);
   updateViewport();
 });
@@ -36,6 +34,7 @@ function animationLoop(accumulatedTime) {
   ship.tick();
   Laser.tick();
   Meteor.tick();
+  Saucer.tick();
   renderer.render(scene, camera);
 }
 
