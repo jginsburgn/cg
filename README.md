@@ -32,3 +32,5 @@ The game must have the following:
 - Credit for the 3D model of the boulder/stone/meteor and saucer goes to [Poly by Google](https://poly.google.com/user/4aEd8rQgKu2)
 
 **Deadline:** 29/03/2019
+
+**Grade: 100**
