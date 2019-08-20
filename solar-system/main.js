@@ -99,6 +99,7 @@ function main() {
     const sunInfo = astrosInfo.sun;
     const sun = await Astro.FromInfo("sun", sunInfo);
     sun.isDone();
+    $("#loading-holder").remove();
     universe.addAstro(sun);
     target = sun;
     flyCamera(target);
